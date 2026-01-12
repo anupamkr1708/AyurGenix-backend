@@ -34,22 +34,20 @@ print("LangSmith Tracing:", os.getenv("LANGCHAIN_TRACING_V2"))
 # LOAD CONFIG
 # -----------------------------------------------------------------------------
 
-CONFIG_PATH = os.getenv("RAG_CONFIG_PATH", "rag_config.json")
 
-if not os.path.exists(CONFIG_PATH):
-    raise RuntimeError("rag_config.json not found")
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX = os.getenv("PINECONE_INDEX")
+MODEL_NAME = os.getenv("MODEL_NAME", "google/flan-t5-small")
 
-with open(CONFIG_PATH, "r") as f:
-    config = json.load(f)
+if not PINECONE_API_KEY or not PINECONE_INDEX:
+   raise RuntimeError("Missing required environment variables")
 
-PINECONE_API_KEY = config["pinecone_api_key"]
-PINECONE_INDEX = config["pinecone_index"]
 
-MODEL_NAME = (
-    config.get("production_model")
-    if torch.cuda.is_available()
-    else config.get("local_model", "google/flan-t5-small")
-)
+# MODEL_NAME = (
+#     config.get("production_model")
+#     if torch.cuda.is_available()
+#     else config.get("local_model", "google/flan-t5-small")
+# )
 
 DEVICE = "GPU" if torch.cuda.is_available() else "CPU"
 
