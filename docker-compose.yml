@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  ayur-backend:
+    image: ayur-backend:latest
+    container_name: ayur-backend
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - hf_cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        limits:
+          memory: 6g
+          cpus: "3.0"
+
+volumes:
+  hf_cache:
