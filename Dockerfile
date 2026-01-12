@@ -28,4 +28,7 @@ COPY . .
 EXPOSE 10000
 
 # IMPORTANT: bind to $PORT and single worker (low RAM)
-CMD gunicorn -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT --workers 1 --timeout 300
+CMD gunicorn -k uvicorn.workers.UvicornWorker main:app \
+--bind 0.0.0.0:$PORT \
+--workers 1 \
+--timeout 600
