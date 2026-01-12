@@ -40,7 +40,8 @@ PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 MODEL_NAME = os.getenv("MODEL_NAME", "google/flan-t5-small")
 
 if not PINECONE_API_KEY or not PINECONE_INDEX:
-   raise RuntimeError("Missing required environment variables")
+   print("❌ Missing environment variables")
+
 
 
 # MODEL_NAME = (
