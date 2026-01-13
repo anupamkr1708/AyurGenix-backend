@@ -17,3 +17,11 @@ groq==1.0.0
 
 # Optional tracing (disabled by default)
 langsmith
+
+sqlalchemy
+psycopg2-binary
+passlib[bcrypt]
+python-jose
+slowapi
+python-jose[cryptography]
+email-validator

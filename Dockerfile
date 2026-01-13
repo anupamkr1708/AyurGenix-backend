@@ -13,15 +13,16 @@ ENV LANGCHAIN_TRACING_V2=false
 WORKDIR /app
 
 # -----------------------------
-# System deps (minimal)
+# System dependencies
 # -----------------------------
 RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
+    libpq-dev gcc \
     && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------
-# Install dependencies
+# Install Python dependencies
 # -----------------------------
 COPY requirements.txt .
 
@@ -36,7 +37,7 @@ RUN pip install --upgrade pip \
 COPY . .
 
 # -----------------------------
-# Render provides $PORT
+# Expose port (Render uses $PORT)
 # -----------------------------
 EXPOSE 10000
 

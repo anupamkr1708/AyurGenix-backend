@@ -340,7 +340,7 @@ class RobustAyurvedicRAG:
         max_tokens: int = 512,
         temperature: float = 0.4,
         system_prompt: str = None,
-    ) -> str:
+    ) -> Tuple[str, Dict]:
         """Generate response using Groq API"""
         
         messages = []
@@ -365,8 +365,17 @@ class RobustAyurvedicRAG:
                 top_p=0.9,
                 stream=False,
             )
+            answer = completion.choices[0].message.content.strip()
+
+            usage = {
+                "prompt_tokens": completion.usage.prompt_tokens if completion.usage else 0,
+                "completion_tokens": completion.usage.completion_tokens if completion.usage else 0,
+                "total_tokens": completion.usage.total_tokens if completion.usage else 0,
+            }
+
+            return answer, usage
             
-            return completion.choices[0].message.content.strip()
+            # return completion.choices[0].message.content.strip()
             
         except Exception as e:
             print(f"❌ Groq API error: {e}")
@@ -484,7 +493,7 @@ Provide a comprehensive answer with:
 
 ANSWER:"""
 
-        answer = self.generate(
+        answer, usage = self.generate(
             prompt, max_tokens=600, temperature=0.4, system_prompt=system_prompt
         )
 
@@ -494,7 +503,7 @@ ANSWER:"""
                 "and the principles outlined in classical references."
             )
 
-        return answer.strip()
+        return answer.strip(), usage
 
     def _calculate_confidence(
         self, query_info: Dict, contexts: List[Dict], answer: str
@@ -586,7 +595,7 @@ ANSWER:"""
         if verbose:
             print("✨ Step 5: Generating answer...")
 
-        answer = self._generate_answer(
+        answer, usage= self._generate_answer(
             user_query, query_info, reranked_contexts, conversation_context
         )
         reasoning_steps.append(f"Answer chars={len(answer)}")
@@ -626,6 +635,8 @@ ANSWER:"""
             "intent": query_info["intent"],
             "entities": query_info["entities"],
             "response_time_seconds": elapsed,
+            "usage": usage,
+            "model": self.model_name,
         }
 
     def reset_conversation(self, session_id: Optional[str] = None):
