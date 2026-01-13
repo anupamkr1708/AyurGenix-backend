@@ -1,14 +1,9 @@
 FROM python:3.10-slim
 
-# -----------------------------
-# Environment optimizations
-# -----------------------------
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 ENV HF_HOME=/root/.cache/huggingface
-ENV TRANSFORMERS_CACHE=/root/.cache/huggingface
-ENV LANGCHAIN_TRACING_V2=false
 
 WORKDIR /app
 
@@ -16,34 +11,31 @@ WORKDIR /app
 # System dependencies
 # -----------------------------
 RUN apt-get update && apt-get install -y \
+    gcc \
+    libffi-dev \
+    libssl-dev \
+    libpq-dev \
     curl \
     ca-certificates \
-    libpq-dev gcc \
     && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------
-# Install Python dependencies
+# Python deps
 # -----------------------------
 COPY requirements.txt .
 
 RUN pip install --upgrade pip \
- && pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu \
- && pip install -r requirements.txt \
- && pip install gunicorn "uvicorn[standard]"
+ && pip install --no-cache-dir torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu \
+ && pip install --no-cache-dir -r requirements.txt \
+ && pip install --no-cache-dir gunicorn "uvicorn[standard]"
 
 # -----------------------------
 # Copy project
 # -----------------------------
 COPY . .
 
-# -----------------------------
-# Expose port (Render uses $PORT)
-# -----------------------------
 EXPOSE 10000
 
-# -----------------------------
-# Production server
-# -----------------------------
 CMD gunicorn main:app \
   -k uvicorn.workers.UvicornWorker \
   --bind 0.0.0.0:${PORT:-10000} \
